@@ -1,3 +1,5 @@
+::Ez csak egy template kód admin jogok szerzéséhez(ami a registrybe való íráshoz kell)
+
 @echo off
 :: BatchGotAdmin (Run as Admin code starts)
 REM --> Check for permissions
