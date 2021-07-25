@@ -8,12 +8,9 @@ import java.util.Scanner;
 import java.util.zip.*;
 import java.security.*;
 
-//A megjegyzések addig maradnak bent amíg meg nem tanulok programozni(addig ne is vedd ki őket)
-
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
 		// Első lépés: Megkeresni az MTA telepítési helyét registry használatával.
 		String path = WinRegistry.readString (
 			    WinRegistry.HKEY_LOCAL_MACHINE,
@@ -27,13 +24,6 @@ public class Main {
 		WinRegistry.createKey(WinRegistry.HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver");
 
 		String[] originalLogList = {"console.log","console.log.1","console.log.2","console.log.3","console.log.4","console.log.5"};
-		//Az eredeti log fájlok elmentése
-		File consolelog = new File(path+"\\console.log");
-		File consolelog1 = new File(path+"\\console.log.1");
-		File consolelog2 = new File(path+"\\console.log.2");
-		File consolelog3 = new File(path+"\\console.log.3");
-		File consolelog4 = new File(path+"\\console.log.4");
-		File consolelog5 = new File(path+"\\console.log.5");
 		
 		//a "backup" mappa létrehozása
 		File backupfolder = new File(path + "\\backup");
@@ -41,74 +31,38 @@ public class Main {
 		File[] filelist = backupfolder.listFiles();
 		
 		if(filelist.length == 0) {
-			zipFile(consolelog.getPath(), backupfolder.getPath() + "\\console.log.1.zip");
-			zipFile(consolelog1.getPath(), backupfolder.getPath() + "\\console.log.2.zip");
-			zipFile(consolelog2.getPath(), backupfolder.getPath() + "\\console.log.3.zip");
-			zipFile(consolelog3.getPath(), backupfolder.getPath() + "\\console.log.4.zip");
-			zipFile(consolelog4.getPath(), backupfolder.getPath() + "\\console.log.5.zip");
-			zipFile(consolelog5.getPath(), backupfolder.getPath() + "\\console.log.6.zip");
-			/*BasicFileAttributes fatr = Files.readAttributes(consolelog.toPath(), 
-	                BasicFileAttributes.class);
+			int i = 1;
+			for(String fileName : originalLogList) {
+				decode(path + "\\" + fileName, path);
+				zipFile(System.getProperty("java.io.tmpdir") + "\\" + fileName, backupfolder.getPath() + "\\console.log." + i + ".zip");
+				i++;
+			}
 			WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, 
 					"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver", 
-					"NewestLogCreationTime", fatr.lastModifiedTime().toString());*/
+					"LastLogID", Integer.toString(6));
 			WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, 
 					"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver", 
 					"LastLogID", "6");
 		} else {
-			/*String newestLogCreateTime = WinRegistry.readString (
-		    		WinRegistry.HKEY_LOCAL_MACHINE,
-		   			"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver",
-		   			"NewestLogCreationTime");*/
 			int LastLogID = Integer.parseInt(WinRegistry.readString (
 		    		WinRegistry.HKEY_LOCAL_MACHINE,
 		   			"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver",
 		   			"LastLogID"));
-			int i = 0;
-			/*for(String fileName : originalLogList) {
-				BasicFileAttributes fatr = Files.readAttributes(new File(path + "\\" + fileName).toPath(), 
-		                BasicFileAttributes.class);
-				if(fatr.lastModifiedTime().toString() == newestLogCreateTime) {
-					return;
-				}
+			int i = 1;
+			for(String fileName : originalLogList) {
+				decode(path + "\\" + fileName, path);
+				zipFile(System.getProperty("java.io.tmpdir") + "\\" + fileName, backupfolder.getPath() + "\\console.log." + (LastLogID + i) + ".zip");
 				i++;
-			}*/
-			if(i == 0) { //azért 0 mert fos vagyok prgoramozásban :'D
-				int curr = 1;
-				for(String fileName : originalLogList) {
-					decode(path + "\\" + fileName, path);
-					zipFile(System.getProperty("java.io.tmpdir") + "\\" + fileName, backupfolder.getPath() + "\\console.log." + (LastLogID + curr) + ".zip");
-					curr++;
-				}
-				/*BasicFileAttributes fatr = Files.readAttributes(consolelog.toPath(), 
-		                BasicFileAttributes.class);
-				WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, 
-						"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver", 
-						"NewestLogCreationTime", fatr.lastModifiedTime().toString());*/
-				WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, 
-						"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver", 
-						"LastLogID", Integer.toString(LastLogID + 6));
-			} else {/*
-				int k = 1;
-				for (int j = i + 1; j < 6; j++) {
-					k++;
-					zipFile(new File(path + originalLogList[j]).getPath(), backupfolder.getPath() + "\\console.log." + (LastLogID + k) + ".zip");
-				}
-				BasicFileAttributes fatr = Files.readAttributes(consolelog.toPath(), 
-		                BasicFileAttributes.class);
-				WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, 
-						"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver", 
-						"NewestLogCreationTime", fatr.lastModifiedTime().toString());
-				WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, 
-						"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver", 
-						"LastLogID", Integer.toString(LastLogID + k));
-				*/
 			}
+			WinRegistry.writeStringValue(WinRegistry.HKEY_LOCAL_MACHINE, 
+					"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver", 
+					"LastLogID", Integer.toString(LastLogID + 6));
 		}
 		System.out.println("A logokat sikerült elmenteni, a kilépéshez nyomj meg az Entert...");
 		System.in.read();
 	}
 	
+	//MTA log javító(bugos log esetén) by Spatulka
 	public static void decode(String filename, String path) {
 		Path filepath = Paths.get(System.getProperty("java.io.tmpdir") + "\\" + new File(filename).getName());
 		try {
@@ -189,19 +143,4 @@ public class Main {
             System.err.println("I/O error: " + ex);
         }
 	}
-	
-	/* Felesleges kód amíg meg nem tanulok programozni :D
-	public static byte[] createSha256(File file) throws Exception  {
-	    byte[] buffer= new byte[8192];
-	    int count;
-	    MessageDigest digest = MessageDigest.getInstance("SHA-256");
-	    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-	    while ((count = bis.read(buffer)) > 0) {
-	        digest.update(buffer, 0, count);
-	    }
-	    bis.close();
-
-	    byte[] hash = digest.digest();
-	    return Base64.getEncoder().encode(hash);
-	}*/
 }
