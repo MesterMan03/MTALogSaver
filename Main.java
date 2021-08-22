@@ -58,6 +58,8 @@ public class Main {
 	
 	//MTA log javító(bugos log esetén) by Spatulka
 	public static void decode(String filename, String path) {
+		//Létrehoz egy új ÜRES fájlt. A fájl neve ugyanaz lesz, amit a filename
+		//Váltózonak adnak át, viszont a fájl helye a temp mappában lesz
 		Path filepath = Paths.get(System.getProperty("java.io.tmpdir") + "\\" + new File(filename).getName());
 		try {
 			Files.deleteIfExists(filepath);
@@ -67,13 +69,14 @@ public class Main {
 			e1.printStackTrace();
 		}
 		
+		//fileIn = eredeti log, fileOut = javított log
 		File fileIn = new File(filename);
 		File fileOut = new File(System.getProperty("java.io.tmpdir") + "\\" + new File(filename).getName());
 		
 		try {
 			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(fileOut), "UTF-8");
 			String line;
-			System.out.println(fileIn.getName() + " beolvasása és bugos karakterek utáni keresés folyamatban...");
+			System.out.println(fileIn.getName() + " beolvasása és bugos karakterek javítása folyamatban...");
 			BufferedReader bufferReader = new BufferedReader(new FileReader(fileIn));
 	        while ((line = bufferReader.readLine()) != null) {
 	        	//Kis betűk
@@ -99,6 +102,9 @@ public class Main {
 			outputStreamWriter.close();
 			bufferReader.close();
 			System.out.println(fileIn.getName() + " sikeresen megtisztítva.");
+			
+		//Ennek soha az életben nem kéne megtörténnie, csak is akkor lehetséges
+		//Ha nincs írási jog a temp mappában (bár biztos hogy lesz az admin jogok miatt...)
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Hiba történt. Részletek:");
@@ -110,6 +116,7 @@ public class Main {
 		}
 	}
 	
+	//Ezt egy random weboldalon találtam, fingom nincs hogy működik :'D
 	public static void zipFile(String filePath, String destinationPath) {
 		try {
 			if(!Files.exists(Paths.get(destinationPath), LinkOption.NOFOLLOW_LINKS)) Files.createFile(Paths.get(destinationPath));
