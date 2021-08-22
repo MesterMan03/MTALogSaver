@@ -1,12 +1,6 @@
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Base64;
-import java.util.Scanner;
 import java.util.zip.*;
-import java.security.*;
 
 public class Main {
 
@@ -58,7 +52,7 @@ public class Main {
 					"SOFTWARE\\WOW6432Node\\MesterMan03\\MTALogSaver", 
 					"LastLogID", Integer.toString(LastLogID + 6));
 		}
-		System.out.println("A logokat sikerült elmenteni, a kilépéshez nyomj meg az Entert...");
+		System.out.println("A logokat sikerült elmenteni, a kilépéshez nyomd meg az Entert...");
 		System.in.read();
 	}
 	
@@ -94,17 +88,11 @@ public class Main {
 				line = line.replaceAll("Ã­", "í");
 				
 				//Nagy betűk
-				line = line.replaceAll("Ã–", "Ö");
+				//Csak ezzel a négy karakterrel működik, a többi javíthatatlan :(
 				line = line.replaceAll("Ã‰", "É");
-				line = line.replaceAll("Å�", "Ő");
+				line = line.replaceAll("Ã–", "Ö");
+				line = line.replaceAll("Ãš", "Ú");
 				line = line.replaceAll("Ãœ", "Ü");
-				
-				if(line.contains("Ã�")) {
-					System.out.println("Kisebb hiba! Részletek: a beolvasott sorban (" + line + ") megtalálható a \'Ã�\'"
-							+ " karakter, ami vagy Á, vagy Í lehet. Mivel nem tudtam eldönteni, hogy pontosan mire váltsam át,"
-							+ " így ezt a karaktert kihagytam!\n");
-				}
-				
 				outputStreamWriter.write(line + "\n");
 	        }
 	        outputStreamWriter.flush();
