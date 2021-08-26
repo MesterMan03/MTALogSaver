@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.zip.*;
 
@@ -65,7 +66,6 @@ public class Main {
 			Files.deleteIfExists(filepath);
 			Files.createFile(filepath);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
@@ -74,10 +74,13 @@ public class Main {
 		File fileOut = new File(System.getProperty("java.io.tmpdir") + "\\" + new File(filename).getName());
 		
 		try {
-			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(fileOut), "UTF-8");
+			FileOutputStream fos = new FileOutputStream(fileOut);
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, "UTF-8");
 			String line;
 			System.out.println(fileIn.getName() + " beolvasása és bugos karakterek javítása folyamatban...");
-			BufferedReader bufferReader = new BufferedReader(new FileReader(fileIn));
+			FileInputStream fis = new FileInputStream(fileIn);
+			InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+			BufferedReader bufferReader = new BufferedReader(isr);
 	        while ((line = bufferReader.readLine()) != null) {
 	        	//Kis betűk
 				line = line.replaceAll("Ã©", "é");
@@ -96,11 +99,17 @@ public class Main {
 				line = line.replaceAll("Ã–", "Ö");
 				line = line.replaceAll("Ãš", "Ú");
 				line = line.replaceAll("Ãœ", "Ü");
+				line = line.replaceAll("Ã“", "Ó");
+				line = line.replaceAll("Å", "Ő");
+				line = line.replaceAll("Ã", "Í");
 				outputStreamWriter.write(line + "\n");
 	        }
 	        outputStreamWriter.flush();
 			outputStreamWriter.close();
+			fos.close();
 			bufferReader.close();
+			isr.close();
+			fis.close();
 			System.out.println(fileIn.getName() + " sikeresen megtisztítva.");
 			
 		//Ennek soha az életben nem kéne megtörténnie, csak is akkor lehetséges
