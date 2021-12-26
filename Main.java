@@ -74,13 +74,17 @@ public class Main {
 		File fileOut = new File(System.getProperty("java.io.tmpdir") + "\\" + new File(filename).getName());
 		
 		try {
-			FileOutputStream fos = new FileOutputStream(fileOut);
-			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, "UTF-8");
 			String line;
 			System.out.println(fileIn.getName() + " beolvasása és bugos karakterek javítása folyamatban...");
+
+			//Mindenféle butaság
+			FileOutputStream fos = new FileOutputStream(fileOut);
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos, "UTF-8");
+
 			FileInputStream fis = new FileInputStream(fileIn);
 			InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
 			BufferedReader bufferReader = new BufferedReader(isr);
+
 	        while ((line = bufferReader.readLine()) != null) {
 	        	//Kis betűk
 				line = line.replaceAll("Ã©", "é");
@@ -94,7 +98,7 @@ public class Main {
 				line = line.replaceAll("Ã­", "í");
 				
 				//Nagy betűk
-				//Csak ezzel a négy karakterrel működik, a többi javíthatatlan :(
+				//Csak ezekkel karakterekkel működik, a többi javíthatatlan :(
 				line = line.replaceAll("Ã‰", "É");
 				line = line.replaceAll("Ã–", "Ö");
 				line = line.replaceAll("Ãš", "Ú");
@@ -107,13 +111,14 @@ public class Main {
 	        outputStreamWriter.flush();
 			outputStreamWriter.close();
 			fos.close();
+
 			bufferReader.close();
 			isr.close();
 			fis.close();
 			System.out.println(fileIn.getName() + " sikeresen megtisztítva.");
 			
-		//Ennek soha az életben nem kéne megtörténnie, csak is akkor lehetséges
-		//Ha nincs írási jog a temp mappában (bár biztos hogy lesz az admin jogok miatt...)
+		//Ennek soha az életben nem kéne megtörténnie, csak is akkor lehetséges,
+		//ha nincs írási jog a temp mappában (bár biztos hogy lesz az admin jogok miatt...)
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Hiba történt. Részletek:");
